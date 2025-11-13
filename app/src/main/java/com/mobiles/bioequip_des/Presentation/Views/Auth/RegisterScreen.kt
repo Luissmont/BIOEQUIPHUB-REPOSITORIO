@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,6 +32,23 @@ fun RegisterScreen() {
     var expanded by remember { mutableStateOf(false) }
 
     val roles = listOf("Biomédico", "Técnico", "Médico", "Enfermero", "Mantenimiento", "Practicante")
+
+    val isEmailValid = email.isEmpty() || (email.contains("@") && email.length > 3)
+    val isPasswordLengthValid = password.isEmpty() || password.length >= 6
+    val isPasswordMatch = confirmPassword.isEmpty() || password == confirmPassword
+
+    val emailError = if (!isEmailValid && email.isNotEmpty()) "Formato de E-mail no válido" else null
+    val passwordError = if (!isPasswordLengthValid && password.isNotEmpty()) "Mínimo 6 caracteres" else null
+    val confirmPasswordError = if (!isPasswordMatch && confirmPassword.isNotEmpty()) "Las contraseñas no coinciden" else null
+
+    val isFormValid = name.isNotBlank() &&
+            lastName.isNotBlank() &&
+            role.isNotBlank() &&
+            isEmailValid &&
+            isPasswordLengthValid &&
+            isPasswordMatch &&
+            password.isNotBlank() &&
+            confirmPassword.isNotBlank()
 
     Box(
         modifier = Modifier
@@ -69,9 +84,32 @@ fun RegisterScreen() {
             ) {
                 CustomTextField(name, { name = it }, "Nombres")
                 CustomTextField(lastName, { lastName = it }, "Apellidos")
-                CustomTextField(email, { email = it }, "E-mail")
-                CustomTextField(password, { password = it }, "Contraseña", isPassword = true)
-                CustomTextField(confirmPassword, { confirmPassword = it }, "Confirmar Contraseña", isPassword = true)
+
+                CustomTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = "E-mail",
+                    isError = emailError != null,
+                    errorMessage = emailError
+                )
+
+                CustomTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = "Contraseña",
+                    isPassword = true,
+                    isError = passwordError != null,
+                    errorMessage = passwordError
+                )
+
+                CustomTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    label = "Confirmar Contraseña",
+                    isPassword = true,
+                    isError = confirmPasswordError != null,
+                    errorMessage = confirmPasswordError
+                )
 
                 Box(modifier = Modifier.fillMaxWidth()) {
                     ExposedDropdownMenuBox(
@@ -79,10 +117,10 @@ fun RegisterScreen() {
                         onExpandedChange = { expanded = it }
                     ) {
                         OutlinedTextField(
-                            value = role,
+                            value = role.ifEmpty { "Seleccione su rol" },
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Seleccione su rol") },
+                            label = { Text("Rol") },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                             },
@@ -119,12 +157,16 @@ fun RegisterScreen() {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = { },
+                    onClick = { /* Lógica de Registro */ },
+                    enabled = isFormValid,
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
                         .height(50.dp),
                     shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black,
+                        disabledContainerColor = Color.Gray
+                    )
                 ) {
                     Text("REGISTRARSE", color = Color.White, fontSize = 16.sp)
                 }
@@ -138,25 +180,46 @@ private fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    isPassword: Boolean = false
+    isPassword: Boolean = false,
+    isError: Boolean = false,
+    errorMessage: String? = null
 ) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp),
-        shape = RoundedCornerShape(30.dp),
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
-    )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = {
+                Text(
+                    label,
+                    color = if (isError) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            isError = isError,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            shape = RoundedCornerShape(30.dp),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Transparent,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                errorContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None
+        )
+        if (isError && errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
