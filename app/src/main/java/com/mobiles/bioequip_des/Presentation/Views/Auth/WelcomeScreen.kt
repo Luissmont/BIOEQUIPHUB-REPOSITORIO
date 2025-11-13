@@ -25,7 +25,6 @@ fun WelcomeScreen() {
             .fillMaxSize()
             .background(BioequipTeal)
     ) {
-        // Contenedor principal para el Logo y los Botones
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -33,7 +32,6 @@ fun WelcomeScreen() {
         ) {
             Spacer(modifier = Modifier.height(100.dp))
 
-            // Logo Central (usando sunny.png)
             Image(
                 painter = painterResource(id = R.drawable.sunny),
                 contentDescription = "Logo BioEquip",
@@ -43,7 +41,6 @@ fun WelcomeScreen() {
                     .padding(vertical = 40.dp)
             )
 
-            // Tarjeta Inferior de Selección
             Card(
                 shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
                 modifier = Modifier
@@ -59,9 +56,8 @@ fun WelcomeScreen() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
                 ) {
-                    // Botón 1: Registrarse (Color BioequipTeal)
                     Button(
-                        onClick = { /* Navegar a RegisterScreen */ },
+                        onClick = {  },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -76,9 +72,8 @@ fun WelcomeScreen() {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Botón 2: Iniciar Sesión (Color Gris)
                     Button(
-                        onClick = { /* Navegar a LoginScreen */ },
+                        onClick = {  },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),

@@ -3,9 +3,11 @@ package com.mobiles.bioequip_des
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.mobiles.bioequip_des.Presentation.Views.Auth.RegisterScreen
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import com.mobiles.bioequip_des.Presentation.Views.Auth.WelcomeScreen
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,16 +15,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             BIOEQUIPDESTheme {
-                RegisterScreen()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    WelcomeScreen()
+                }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BIOEQUIPDESTheme {
-        RegisterScreen()
     }
 }
