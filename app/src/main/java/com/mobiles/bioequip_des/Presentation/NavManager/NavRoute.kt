@@ -7,6 +7,9 @@ sealed class NavRoute(val route: String) {
     object Register : NavRoute("register")
     object RegistrationSuccess : NavRoute("registration_success")
 
+    object JoinRegistry : NavRoute("join_registry")
+
+
     object MainContainer : NavRoute("main_container")
     object Home : NavRoute("home")
     object Inventory : NavRoute("inventory")

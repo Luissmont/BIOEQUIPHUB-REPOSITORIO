@@ -9,6 +9,8 @@ import com.mobiles.bioequip_des.Presentation.Views.Auth.RegisterScreen
 import com.mobiles.bioequip_des.Presentation.Views.Auth.SplashScreen
 import com.mobiles.bioequip_des.Presentation.Views.Auth.WelcomeScreen
 import com.mobiles.bioequip_des.Presentation.Views.Auth.RegistrationSuccessScreen
+import com.mobiles.bioequip_des.Presentation.Views.Registry.JoinRegistryScreen
+
 
 @Composable
 fun NavHostApp(
@@ -60,7 +62,7 @@ fun NavHostApp(
                     }
                 },
                 onNavigateToJoinRegistry = {
-                    navController.navigate(NavRoute.MainContainer.route) {
+                    navController.navigate(NavRoute.JoinRegistry.route) {
                         popUpTo(NavRoute.Welcome.route) { inclusive = true }
                     }
                 }
@@ -74,6 +76,19 @@ fun NavHostApp(
                 },
                 onLoginSuccess = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = NavRoute.JoinRegistry.route) {
+            JoinRegistryScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onJoinSuccess = {
+                    navController.navigate(NavRoute.Welcome.route) {
+                        popUpTo(NavRoute.Welcome.route) { inclusive = true }
+                    }
                 }
             )
         }
