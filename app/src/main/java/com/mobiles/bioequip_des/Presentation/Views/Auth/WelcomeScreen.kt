@@ -19,7 +19,11 @@ import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 import com.mobiles.bioequip_des.Presentation.ui.theme.BioequipTeal
 
 @Composable
-fun WelcomeScreen() {
+fun WelcomeScreen(
+    onNavigateToRegister: () -> Unit = {},
+    OnNavigateLogin: () -> Unit = {},
+    onNavigateToLogin: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +61,7 @@ fun WelcomeScreen() {
                     verticalArrangement = Arrangement.Top
                 ) {
                     Button(
-                        onClick = {  },
+                        onClick = onNavigateToRegister,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -73,7 +77,7 @@ fun WelcomeScreen() {
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Button(
-                        onClick = {  },
+                        onClick = onNavigateToLogin,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -95,6 +99,9 @@ fun WelcomeScreen() {
 @Composable
 fun WelcomeScreenPreview() {
     BIOEQUIPDESTheme {
-        WelcomeScreen()
+        WelcomeScreen(
+            onNavigateToRegister = {},
+            onNavigateToLogin = {}
+        )
     }
 }

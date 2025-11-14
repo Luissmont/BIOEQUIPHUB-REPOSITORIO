@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +24,10 @@ import com.mobiles.bioequip_des.Presentation.ui.theme.BioequipTeal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(
+    onNavigateBack: () -> Unit = {},
+    onRegisterSuccess: () -> Unit ={}
+) {
     var name by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -55,6 +60,19 @@ fun RegisterScreen() {
             .fillMaxSize()
             .background(BioequipTeal)
     ) {
+        IconButton(
+            onClick = onNavigateBack,
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.TopStart)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Regresar",
+                tint = Color.Black
+            )
+        }
+
         Text(
             text = "Regístrate",
             style = TextStyle(
@@ -157,7 +175,9 @@ fun RegisterScreen() {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = { /* Lógica de Registro */ },
+                    onClick = {
+                        onRegisterSuccess()
+                    },
                     enabled = isFormValid,
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
@@ -174,7 +194,6 @@ fun RegisterScreen() {
         }
     }
 }
-
 @Composable
 private fun CustomTextField(
     value: String,
@@ -226,6 +245,9 @@ private fun CustomTextField(
 @Composable
 fun RegisterScreenPreview() {
     BIOEQUIPDESTheme {
-        RegisterScreen()
+        RegisterScreen(
+            onNavigateBack = {},
+            onRegisterSuccess = {}
+        )
     }
 }
