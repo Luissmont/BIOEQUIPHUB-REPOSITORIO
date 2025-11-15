@@ -43,7 +43,6 @@ fun CreateRegistryScreen(
             .verticalScroll(rememberScrollState())
             .background(color = Color.White)
     ) {
-        // Imagen superior
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -57,7 +56,6 @@ fun CreateRegistryScreen(
             )
         }
 
-        // Contenido principal
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -65,7 +63,6 @@ fun CreateRegistryScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Título
             Text(
                 text = "Rellene el Formulario",
                 fontSize = 24.sp,
@@ -73,14 +70,12 @@ fun CreateRegistryScreen(
                 color = Color.Black
             )
 
-            // Subtítulo
             Text(
                 text = "Hacia que lugar va dirigido su registro",
                 fontSize = 14.sp,
                 color = Color.DarkGray
             )
 
-            // Botones de selección de tipo
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -102,7 +97,6 @@ fun CreateRegistryScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo: Nombre de la unidad
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -133,7 +127,6 @@ fun CreateRegistryScreen(
                 )
             }
 
-            // Campo: Código de acceso
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -166,10 +159,8 @@ fun CreateRegistryScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Botón Crear Unidad
             Button(
                 onClick = {
-                    // TODO: Crear registro en Firebase
                     if (isFormValid) {
                         onCreateSuccess()
                     }
