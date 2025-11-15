@@ -89,7 +89,6 @@ fun JoinRegistryScreen(
 
             Button(
                 onClick = {
-                    // TODO: Validar código con Firebase
                     if (isCodeValid) {
                         onJoinSuccess()
                     }
