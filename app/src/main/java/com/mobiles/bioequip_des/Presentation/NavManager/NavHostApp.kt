@@ -27,6 +27,11 @@ fun NavHostApp(
                     navController.navigate(NavRoute.Welcome.route) {
                         popUpTo(NavRoute.Splash.route) { inclusive = true }
                     }
+                },
+                onNavigateToMain = {
+                    navController.navigate(NavRoute.Welcome.route){
+                        popUpTo(NavRoute.Splash.route) { inclusive = true }
+                    }
                 }
             )
         }
@@ -85,7 +90,9 @@ fun NavHostApp(
                     navController.popBackStack()
                 },
                 onLoginSuccess = {
-                    navController.popBackStack()
+                    navController.navigate(NavRoute.Welcome.route) {
+                        popUpTo(NavRoute.Welcome.route){ inclusive = true }
+                    }
                 }
             )
         }

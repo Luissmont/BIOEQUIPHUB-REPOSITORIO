@@ -1,6 +1,5 @@
 package com.mobiles.bioequip_des.Presentation.Views.Auth
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,24 +10,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mobiles.bioequip_des.Presentation.ViewModel.AuthUiState
+import com.mobiles.bioequip_des.Presentation.ViewModel.AuthViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 import com.mobiles.bioequip_des.Presentation.ui.theme.BioequipTeal
-import com.mobiles.bioequip_des.R
 
 @Composable
 fun LoginScreen(
     onNavigateBack: () -> Unit = {},
-    onLoginSuccess: () -> Unit = {}
+    onLoginSuccess: () -> Unit = {},
+    authViewModel: AuthViewModel = viewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val uiState by authViewModel.uiState.collectAsState()
 
     val isEmailValid = email.isEmpty() || (email.contains("@") && email.length > 3)
     val isPasswordValid = password.isEmpty() || password.length >= 6
@@ -37,6 +40,16 @@ fun LoginScreen(
     val passwordError = if (!isPasswordValid && password.isNotEmpty()) "Mínimo 6 caracteres" else null
 
     val isFormValid = email.isNotBlank() && password.isNotBlank() && isEmailValid && isPasswordValid
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is AuthUiState.Success -> {
+                authViewModel.resetState()
+                onLoginSuccess()
+            }
+            else -> {}
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -155,13 +168,22 @@ fun LoginScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (uiState is AuthUiState.Error) {
+                    Text(
+                        text = (uiState as AuthUiState.Error).message,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
 
                 Button(
                     onClick = {
-                        onLoginSuccess()
+                        authViewModel.login(email, password)
                     },
-                    enabled = isFormValid,
+                    enabled = isFormValid && uiState !is AuthUiState.Loading,
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
                         .height(50.dp),
@@ -171,16 +193,15 @@ fun LoginScreen(
                         disabledContainerColor = Color.Gray
                     )
                 ) {
-                    Text("INICIAR SESIÓN", color = Color.White, fontSize = 16.sp)
+                    if (uiState is AuthUiState.Loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White
+                        )
+                    } else {
+                        Text("INICIAR SESIÓN", color = Color.White, fontSize = 16.sp)
+                    }
                 }
-                Image(
-                    painter = painterResource(id = R.drawable.logo_bioequiphub),
-                    contentDescription = "Logo BioEquip",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .weight(1f),
-                )
             }
         }
     }
@@ -190,9 +211,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     BIOEQUIPDESTheme {
-        LoginScreen(
-            onNavigateBack = {},
-            onLoginSuccess = {}
-        )
+        LoginScreen()
     }
 }

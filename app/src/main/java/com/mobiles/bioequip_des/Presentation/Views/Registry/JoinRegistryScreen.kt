@@ -15,24 +15,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.mobiles.bioequip_des.R
+import com.mobiles.bioequip_des.Presentation.ViewModel.RegistryUiState
+import com.mobiles.bioequip_des.Presentation.ViewModel.RegistryViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
-import androidx.compose.foundation.background
 
 @Composable
 fun JoinRegistryScreen(
     onNavigateBack: () -> Unit = {},
-    onJoinSuccess: () -> Unit = {}
+    onJoinSuccess: () -> Unit = {},
+    registryViewModel: RegistryViewModel = viewModel()
 ) {
     var code by remember { mutableStateOf("") }
     val isCodeValid = code.isNotBlank() && code.length >= 4
+    val uiState by registryViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is RegistryUiState.JoinSuccess -> {
+                registryViewModel.resetState()
+                onJoinSuccess()
+            }
+            else -> {}
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(color = Color.White)
-
     ) {
         Box(
             modifier = Modifier
@@ -54,7 +67,6 @@ fun JoinRegistryScreen(
                 .padding(horizontal = 32.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(24.dp)
-
         ) {
             Text(
                 text = "Ingrese a un Registro",
@@ -87,13 +99,28 @@ fun JoinRegistryScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            if (uiState is RegistryUiState.Error) {
+                Text(
+                    text = (uiState as RegistryUiState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+
             Button(
                 onClick = {
-                    if (isCodeValid) {
-                        onJoinSuccess()
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser != null && isCodeValid) {
+                        registryViewModel.requestJoinRegistry(
+                            userId = currentUser.uid,
+                            userName = currentUser.displayName ?: "",
+                            userEmail = currentUser.email ?: "",
+                            accessCode = code
+                        )
                     }
                 },
-                enabled = isCodeValid,
+                enabled = isCodeValid && uiState !is RegistryUiState.Loading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -103,13 +130,20 @@ fun JoinRegistryScreen(
                     disabledContainerColor = Color.Gray
                 )
             ) {
-                Text("continuar", fontSize = 16.sp, color = Color.White)
+                if (uiState is RegistryUiState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
+                    )
+                } else {
+                    Text("continuar", fontSize = 16.sp, color = Color.White)
+                }
             }
 
             Text(
                 text = "Su solicitud para entrar al registro especificado será evaluada por el equipo encargado de administrar el registro. Cuando su petición sea aceptada recibirá una notificación del equipo",
                 fontSize = 12.sp,
-                color = Color.Black,
+                color = Color.Gray,
                 textAlign = TextAlign.Center,
                 lineHeight = 16.sp,
                 modifier = Modifier.fillMaxWidth()

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "798297721036",
+    "project_id": "bioequip-14654",
+    "storage_bucket": "bioequip-14654.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:798297721036:android:e382de89706b4e11feda69",
+        "android_client_info": {
+          "package_name": "com.mobiles.bioequip_des"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvp9nBKdowL94wi4bzqxY2w35gH6rfX7s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

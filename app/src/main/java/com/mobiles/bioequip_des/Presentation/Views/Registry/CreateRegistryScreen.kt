@@ -1,7 +1,6 @@
 package com.mobiles.bioequip_des.Presentation.Views.Registry
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,31 +16,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.mobiles.bioequip_des.R
+import com.mobiles.bioequip_des.Presentation.ViewModel.RegistryUiState
+import com.mobiles.bioequip_des.Presentation.ViewModel.RegistryViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 
 @Composable
 fun CreateRegistryScreen(
     onNavigateBack: () -> Unit = {},
-    onCreateSuccess: () -> Unit = {}
+    onCreateSuccess: () -> Unit = {},
+    registryViewModel: RegistryViewModel = viewModel()
 ) {
     var selectedType by remember { mutableStateOf("") }
     var unitName by remember { mutableStateOf("") }
     var accessCode by remember { mutableStateOf("") }
 
     val registryTypes = listOf("Hospital", "Clínica", "Taller")
+    val uiState by registryViewModel.uiState.collectAsState()
 
     val isFormValid = selectedType.isNotBlank() &&
             unitName.isNotBlank() &&
             accessCode.isNotBlank() &&
             accessCode.length >= 4
 
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is RegistryUiState.CreateSuccess -> {
+                registryViewModel.resetState()
+                onCreateSuccess()
+            }
+            else -> {}
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
             .verticalScroll(rememberScrollState())
-            .background(color = Color.White)
     ) {
         Box(
             modifier = Modifier
@@ -90,7 +104,7 @@ fun CreateRegistryScreen(
                             contentColor = if (selectedType == type) Color.White else Color.Black
                         )
                     ) {
-                        Text(type, fontSize = 11.sp)
+                        Text(type, fontSize = 14.sp)
                     }
                 }
             }
@@ -116,8 +130,6 @@ fun CreateRegistryScreen(
                         .height(56.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
                         focusedBorderColor = Color.LightGray,
                         unfocusedBorderColor = Color.LightGray,
                         focusedContainerColor = Color(0xFFE8E8E8),
@@ -146,8 +158,6 @@ fun CreateRegistryScreen(
                         .height(56.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
                         focusedBorderColor = Color.LightGray,
                         unfocusedBorderColor = Color.LightGray,
                         focusedContainerColor = Color(0xFFE8E8E8),
@@ -157,15 +167,30 @@ fun CreateRegistryScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (uiState is RegistryUiState.Error) {
+                Text(
+                    text = (uiState as RegistryUiState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
 
             Button(
                 onClick = {
-                    if (isFormValid) {
-                        onCreateSuccess()
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser != null) {
+                        registryViewModel.createRegistry(
+                            name = unitName,
+                            type = selectedType,
+                            accessCode = accessCode,
+                            adminUid = currentUser.uid
+                        )
                     }
                 },
-                enabled = isFormValid,
+                enabled = isFormValid && uiState !is RegistryUiState.Loading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -175,7 +200,14 @@ fun CreateRegistryScreen(
                     disabledContainerColor = Color.Gray
                 )
             ) {
-                Text("Crear Unidad", fontSize = 16.sp, color = Color.White)
+                if (uiState is RegistryUiState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
+                    )
+                } else {
+                    Text("Crear Unidad", fontSize = 16.sp, color = Color.White)
+                }
             }
         }
     }

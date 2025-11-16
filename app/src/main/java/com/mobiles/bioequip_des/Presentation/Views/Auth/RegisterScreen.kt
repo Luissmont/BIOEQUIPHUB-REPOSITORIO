@@ -19,6 +19,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mobiles.bioequip_des.Presentation.ViewModel.AuthUiState
+import com.mobiles.bioequip_des.Presentation.ViewModel.AuthViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 import com.mobiles.bioequip_des.Presentation.ui.theme.BioequipTeal
 
@@ -26,7 +29,8 @@ import com.mobiles.bioequip_des.Presentation.ui.theme.BioequipTeal
 @Composable
 fun RegisterScreen(
     onNavigateBack: () -> Unit = {},
-    onRegisterSuccess: () -> Unit ={}
+    onRegisterSuccess: () -> Unit = {},
+    authViewModel: AuthViewModel = viewModel()
 ) {
     var name by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -38,6 +42,9 @@ fun RegisterScreen(
 
     val roles = listOf("Biomédico", "Técnico", "Médico", "Enfermero", "Mantenimiento", "Practicante")
 
+    val uiState by authViewModel.uiState.collectAsState()
+
+    // Validaciones
     val isEmailValid = email.isEmpty() || (email.contains("@") && email.length > 3)
     val isPasswordLengthValid = password.isEmpty() || password.length >= 6
     val isPasswordMatch = confirmPassword.isEmpty() || password == confirmPassword
@@ -54,6 +61,16 @@ fun RegisterScreen(
             isPasswordMatch &&
             password.isNotBlank() &&
             confirmPassword.isNotBlank()
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is AuthUiState.Success -> {
+                authViewModel.resetState()
+                onRegisterSuccess()
+            }
+            else -> {}
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -172,13 +189,22 @@ fun RegisterScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (uiState is AuthUiState.Error) {
+                    Text(
+                        text = (uiState as AuthUiState.Error).message,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
 
                 Button(
                     onClick = {
-                        onRegisterSuccess()
+                        authViewModel.register(name, lastName, email, password, role)
                     },
-                    enabled = isFormValid,
+                    enabled = isFormValid && uiState !is AuthUiState.Loading,
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
                         .height(50.dp),
@@ -188,12 +214,20 @@ fun RegisterScreen(
                         disabledContainerColor = Color.Gray
                     )
                 ) {
-                    Text("REGISTRARSE", color = Color.White, fontSize = 16.sp)
+                    if (uiState is AuthUiState.Loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White
+                        )
+                    } else {
+                        Text("REGISTRARSE", color = Color.White, fontSize = 16.sp)
+                    }
                 }
             }
         }
     }
 }
+
 @Composable
 private fun CustomTextField(
     value: String,
@@ -245,9 +279,6 @@ private fun CustomTextField(
 @Composable
 fun RegisterScreenPreview() {
     BIOEQUIPDESTheme {
-        RegisterScreen(
-            onNavigateBack = {},
-            onRegisterSuccess = {}
-        )
+        RegisterScreen()
     }
 }
