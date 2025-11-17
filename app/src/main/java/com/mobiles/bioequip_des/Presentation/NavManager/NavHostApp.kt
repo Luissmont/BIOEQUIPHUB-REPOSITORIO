@@ -28,6 +28,11 @@ fun NavHostApp(
                         popUpTo(NavRoute.Splash.route) { inclusive = true }
                     }
                 },
+                onNavigateToRegistrationSuccess = {
+                    navController.navigate(NavRoute.RegistrationSuccess.route) {
+                        popUpTo(NavRoute.Splash.route) { inclusive = true }
+                    }
+                },
                 onNavigateToMain = {
                     navController.navigate(NavRoute.Welcome.route){
                         popUpTo(NavRoute.Splash.route) { inclusive = true }

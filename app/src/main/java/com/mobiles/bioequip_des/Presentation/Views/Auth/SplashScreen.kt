@@ -20,6 +20,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(
     onNavigateToWelcome: () -> Unit = {},
+    onNavigateToRegistrationSuccess: () -> Unit = {},
     onNavigateToMain: () -> Unit = {},
     authViewModel: AuthViewModel = viewModel()
 ) {
@@ -27,7 +28,11 @@ fun SplashScreen(
         delay(2000)
 
         if (authViewModel.checkUserSession()) {
-            onNavigateToMain()
+            if (authViewModel.checkUserHasRegistry()) {
+                onNavigateToMain()
+            } else {
+                onNavigateToRegistrationSuccess()
+            }
         } else {
             onNavigateToWelcome()
         }

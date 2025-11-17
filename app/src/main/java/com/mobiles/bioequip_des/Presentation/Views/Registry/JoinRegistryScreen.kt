@@ -112,7 +112,7 @@ fun JoinRegistryScreen(
                 onClick = {
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     if (currentUser != null && isCodeValid) {
-                        registryViewModel.requestJoinRegistry(
+                        registryViewModel.joinRegistry(
                             userId = currentUser.uid,
                             userName = currentUser.displayName ?: "",
                             userEmail = currentUser.email ?: "",
@@ -141,7 +141,7 @@ fun JoinRegistryScreen(
             }
 
             Text(
-                text = "Su solicitud para entrar al registro especificado será evaluada por el equipo encargado de administrar el registro. Cuando su petición sea aceptada recibirá una notificación del equipo",
+                text = "Una vez ingresado el código correcto, tendrás acceso inmediato al registro hospitalario y podrás visualizar el inventario de equipos médicos.",
                 fontSize = 12.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center,

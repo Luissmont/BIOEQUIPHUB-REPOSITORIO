@@ -2,7 +2,6 @@ package com.mobiles.bioequip_des.Data.Repositories
 
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.mobiles.bioequip_des.Data.Models.JoinRequest
 import com.mobiles.bioequip_des.Data.Models.Registry
 import kotlinx.coroutines.tasks.await
 
@@ -54,12 +53,12 @@ class RegistryRepository {
         }
     }
 
-    suspend fun requestJoinRegistry(
+    suspend fun joinRegistry(
         userId: String,
         userName: String,
         userEmail: String,
         accessCode: String
-    ): Result<JoinRequest> {
+    ): Result<Registry> {
         return try {
             val querySnapshot = firestore.collection("registries")
                 .whereEqualTo("accessCode", accessCode)
@@ -70,23 +69,30 @@ class RegistryRepository {
                 throw Exception("Código de acceso inválido")
             }
 
-            val registry = querySnapshot.documents[0].toObject(Registry::class.java)
+            val registryDoc = querySnapshot.documents[0]
+            val registry = registryDoc.toObject(Registry::class.java)
                 ?: throw Exception("Error al obtener registro")
 
-            val requestRef = firestore.collection("joinRequests").document()
-            val joinRequest = JoinRequest(
-                id = requestRef.id,
-                userId = userId,
-                userName = userName,
-                userEmail = userEmail,
-                registryId = registry.id,
-                registryName = registry.name,
-                status = "pending"
-            )
+            if (registry.members.contains(userId)) {
+                throw Exception("Ya eres miembro de este registro")
+            }
 
-            requestRef.set(joinRequest).await()
+            firestore.collection("registries")
+                .document(registry.id)
+                .update("members", FieldValue.arrayUnion(userId))
+                .await()
 
-            Result.success(joinRequest)
+            firestore.collection("users")
+                .document(userId)
+                .update(
+                    mapOf(
+                        "registryId" to registry.id,
+                        "registryName" to registry.name
+                    )
+                )
+                .await()
+
+            Result.success(registry)
         } catch (e: Exception) {
             Result.failure(e)
         }

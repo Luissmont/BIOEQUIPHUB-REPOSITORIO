@@ -2,7 +2,6 @@ package com.mobiles.bioequip_des.Presentation.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mobiles.bioequip_des.Data.Models.JoinRequest
 import com.mobiles.bioequip_des.Data.Models.Registry
 import com.mobiles.bioequip_des.Data.Repositories.RegistryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +13,7 @@ sealed class RegistryUiState {
     object Idle : RegistryUiState()
     object Loading : RegistryUiState()
     data class CreateSuccess(val registry: Registry) : RegistryUiState()
-    data class JoinSuccess(val request: JoinRequest) : RegistryUiState()
+    data class JoinSuccess(val registry: Registry) : RegistryUiState()
     data class Error(val message: String) : RegistryUiState()
 }
 
@@ -24,6 +23,7 @@ class RegistryViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<RegistryUiState>(RegistryUiState.Idle)
     val uiState: StateFlow<RegistryUiState> = _uiState.asStateFlow()
+
 
     fun createRegistry(
         name: String,
@@ -46,7 +46,7 @@ class RegistryViewModel : ViewModel() {
         }
     }
 
-    fun requestJoinRegistry(
+    fun joinRegistry(
         userId: String,
         userName: String,
         userEmail: String,
@@ -55,13 +55,13 @@ class RegistryViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = RegistryUiState.Loading
 
-            val result = repository.requestJoinRegistry(userId, userName, userEmail, accessCode)
+            val result = repository.joinRegistry(userId, userName, userEmail, accessCode)
 
             _uiState.value = if (result.isSuccess) {
                 RegistryUiState.JoinSuccess(result.getOrNull()!!)
             } else {
                 RegistryUiState.Error(
-                    result.exceptionOrNull()?.message ?: "Error al solicitar unión"
+                    result.exceptionOrNull()?.message ?: "Error al unirse al registro"
                 )
             }
         }

@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mobiles.bioequip_des.Data.Models.User
 import kotlinx.coroutines.tasks.await
+import kotlin.text.get
 
 class AuthRepository {
 
@@ -88,4 +89,20 @@ class AuthRepository {
             Result.failure(e)
         }
     }
+    suspend fun userHasRegistry(): Boolean {
+        return try {
+            val firebaseUser = getCurrentUser() ?: return false
+
+            val userDoc = firestore.collection("users")
+                .document(firebaseUser.uid)
+                .get()
+                .await()
+
+            val registryId = userDoc.getString("registryId")
+            !registryId.isNullOrBlank()
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
+

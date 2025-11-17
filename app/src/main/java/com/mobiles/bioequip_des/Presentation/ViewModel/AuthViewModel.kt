@@ -73,4 +73,10 @@ class AuthViewModel : ViewModel() {
     fun resetState() {
         _uiState.value = AuthUiState.Idle
     }
+
+    suspend fun checkUserHasRegistry(): Boolean {
+        return repository.userHasRegistry()
+    }
+
 }
+
