@@ -57,5 +57,34 @@ class UserRepository {
         }
     }
 
+    suspend fun leaveRegistry(userId: String, registryId: String): Result<Unit> {
+        return try {
 
+            firestore.collection("users")
+                .document(userId)
+                .update("registryIds", FieldValue.arrayRemove(registryId))
+                .await()
+
+            firestore.collection("registries")
+                .document(registryId)
+                .update("members", FieldValue.arrayRemove(userId))
+                .await()
+
+            val userDoc = firestore.collection("users")
+                .document(userId)
+                .get()
+                .await()
+
+            if (userDoc.getString("activeRegistryId") == registryId) {
+                firestore.collection("users")
+                    .document(userId)
+                    .update("activeRegistryId", null)
+                    .await()
+            }
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
