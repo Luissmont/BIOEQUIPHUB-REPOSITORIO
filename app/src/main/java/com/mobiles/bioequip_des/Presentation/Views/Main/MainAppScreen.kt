@@ -70,7 +70,21 @@ fun MainAppScreen(
             navController = navController,
             startDestination = NavRoute.Profile.route,
             modifier = Modifier.padding(innerPadding)
-        )
+        ) {
+            composable(NavRoute.Home.route) {
+                HomeScreen()
+            }
+            composable(NavRoute.Profile.route) {
+                ProfileScreen(
+                    onNavigateToCreateRegistry = onNavigateToCreateRegistry,
+                    onNavigateToJoinRegistry = onNavigateToJoinRegistry
+                )
+            }
+            composable(NavRoute.Settings.route) {
+                SettingsScreen(
+                    onLogout = onLogout
+                )
+            }
         }
     }
 }
