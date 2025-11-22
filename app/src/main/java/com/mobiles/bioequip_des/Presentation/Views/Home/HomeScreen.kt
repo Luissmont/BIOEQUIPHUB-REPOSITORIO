@@ -174,3 +174,105 @@ private fun HomeContent(
         }
     }
 }
+
+@Composable
+private fun OptionCard(
+    icon: Int,
+    title: String,
+    description: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Ícono
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .background(Color.White, RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = icon),
+                    contentDescription = title,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
+            // Texto
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = description,
+                    fontSize = 12.sp,
+                    color = Color.DarkGray,
+                    lineHeight = 16.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NoRegistrySelected() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.sunny),
+                contentDescription = "No registry",
+                modifier = Modifier.size(120.dp)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "No has seleccionado ninguna unidad",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Ve a la pestaña de Perfil y selecciona una unidad para comenzar",
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Center,
+                lineHeight = 20.sp
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    BIOEQUIPDESTheme {
+        HomeScreen()
+    }
+}
