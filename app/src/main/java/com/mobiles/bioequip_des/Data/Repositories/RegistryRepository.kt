@@ -41,8 +41,8 @@ class RegistryRepository {
                 .document(adminUid)
                 .update(
                     mapOf(
-                        "registryId" to registry.id,
-                        "registryName" to registry.name
+                        "registryIds" to FieldValue.arrayUnion(registry.id),
+                        "activeRegistryId" to registry.id
                     )
                 )
                 .await()
@@ -86,8 +86,8 @@ class RegistryRepository {
                 .document(userId)
                 .update(
                     mapOf(
-                        "registryId" to registry.id,
-                        "registryName" to registry.name
+                        "registryIds" to FieldValue.arrayUnion(registry.id),
+                        "activeRegistryId" to registry.id
                     )
                 )
                 .await()
