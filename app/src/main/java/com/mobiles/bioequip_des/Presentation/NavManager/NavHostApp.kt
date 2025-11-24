@@ -11,6 +11,7 @@ import com.mobiles.bioequip_des.Presentation.Views.Auth.WelcomeScreen
 import com.mobiles.bioequip_des.Presentation.Views.Auth.RegistrationSuccessScreen
 import com.mobiles.bioequip_des.Presentation.Views.Registry.JoinRegistryScreen
 import com.mobiles.bioequip_des.Presentation.Views.Registry.CreateRegistryScreen
+import com.mobiles.bioequip_des.Presentation.Views.Main.MainAppScreen
 
 
 @Composable
@@ -34,7 +35,7 @@ fun NavHostApp(
                     }
                 },
                 onNavigateToMain = {
-                    navController.navigate(NavRoute.Welcome.route){
+                    navController.navigate(NavRoute.MainContainer.route){
                         popUpTo(NavRoute.Splash.route) { inclusive = true }
                     }
                 }
@@ -82,8 +83,8 @@ fun NavHostApp(
                     navController.popBackStack()
                 },
                 onCreateSuccess = {
-                    navController.navigate(NavRoute.Welcome.route) {
-                        popUpTo(NavRoute.Welcome.route) { inclusive = true }
+                    navController.navigate(NavRoute.MainContainer.route) {
+                        popUpTo(NavRoute.RegistrationSuccess.route) { inclusive = true }
                     }
                 }
             )
@@ -95,7 +96,7 @@ fun NavHostApp(
                     navController.popBackStack()
                 },
                 onLoginSuccess = {
-                    navController.navigate(NavRoute.Welcome.route) {
+                    navController.navigate(NavRoute.MainContainer.route) {
                         popUpTo(NavRoute.Welcome.route){ inclusive = true }
                     }
                 }
@@ -108,9 +109,25 @@ fun NavHostApp(
                     navController.popBackStack()
                 },
                 onJoinSuccess = {
-                    navController.navigate(NavRoute.Welcome.route) {
-                        popUpTo(NavRoute.Welcome.route) { inclusive = true }
+                    navController.navigate(NavRoute.MainContainer.route) {
+                        popUpTo(NavRoute.RegistrationSuccess.route) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        composable(route = NavRoute.MainContainer.route) {
+            MainAppScreen(
+                onLogout = {
+                    navController.navigate(NavRoute.Welcome.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onNavigateToCreateRegistry = {
+                    navController.navigate(NavRoute.CreateRegistry.route)
+                },
+                onNavigateToJoinRegistry = {
+                    navController.navigate(NavRoute.JoinRegistry.route)
                 }
             )
         }
