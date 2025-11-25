@@ -6,7 +6,7 @@ data class User(
     val lastName: String = "",
     val email: String = "",
     val role: String = "",
-    val registryId: String? = null,
-    val registryName: String? = null,
+    val registryIds: List<String> = emptyList(),
+    val activeRegistryId:String? = null,
     val createdAt: Long = System.currentTimeMillis()
 )

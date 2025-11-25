@@ -98,8 +98,8 @@ class AuthRepository {
                 .get()
                 .await()
 
-            val registryId = userDoc.getString("registryId")
-            !registryId.isNullOrBlank()
+            val registryIds = userDoc.get("registryIds") as? List<String> ?: emptyList()
+            registryIds.isNotEmpty()
         } catch (e: Exception) {
             false
         }
