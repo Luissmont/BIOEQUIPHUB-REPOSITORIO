@@ -23,7 +23,9 @@ import com.mobiles.bioequip_des.Presentation.ui.theme.BioequipTeal
 fun MainAppScreen(
     onLogout: () -> Unit = {},
     onNavigateToCreateRegistry: () -> Unit = {},
-    onNavigateToJoinRegistry: () -> Unit = {}
+    onNavigateToJoinRegistry: () -> Unit = {},
+    onNavigateToInventory: () -> Unit = {},
+    onNavigateToAddEquipment: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -72,7 +74,10 @@ fun MainAppScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(NavRoute.Home.route) {
-                HomeScreen()
+                HomeScreen(
+                    onNavigateToInventory = onNavigateToInventory,
+                    onNavigateToAddEquipment = onNavigateToAddEquipment
+                )
             }
             composable(NavRoute.Profile.route) {
                 ProfileScreen(

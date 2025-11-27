@@ -12,6 +12,9 @@ import com.mobiles.bioequip_des.Presentation.Views.Auth.RegistrationSuccessScree
 import com.mobiles.bioequip_des.Presentation.Views.Registry.JoinRegistryScreen
 import com.mobiles.bioequip_des.Presentation.Views.Registry.CreateRegistryScreen
 import com.mobiles.bioequip_des.Presentation.Views.Main.MainAppScreen
+import com.mobiles.bioequip_des.Presentation.Views.Home.AddEquipmentScreen
+import com.mobiles.bioequip_des.Presentation.Views.Home.EquipmentAddedSuccessScreen
+import com.mobiles.bioequip_des.Presentation.Views.Home.InventoryScreen
 
 
 @Composable
@@ -128,6 +131,44 @@ fun NavHostApp(
                 },
                 onNavigateToJoinRegistry = {
                     navController.navigate(NavRoute.JoinRegistry.route)
+                },
+                onNavigateToInventory = {
+                    navController.navigate(NavRoute.Inventory.route)
+                },
+                onNavigateToAddEquipment = {
+                    navController.navigate(NavRoute.AddEquipment.route)
+                }
+            )
+        }
+
+
+        composable(route = NavRoute.Inventory.route) {
+            InventoryScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(route = NavRoute.AddEquipment.route) {
+            AddEquipmentScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onEquipmentAdded = {
+                    navController.navigate(NavRoute.EquipmentAddedSuccess.route) {
+                        popUpTo(NavRoute.AddEquipment.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(route = NavRoute.EquipmentAddedSuccess.route) {
+            EquipmentAddedSuccessScreen(
+                onNavigateToHome = {
+                    navController.navigate(NavRoute.MainContainer.route) {
+                        popUpTo(NavRoute.MainContainer.route) { inclusive = true }
+                    }
                 }
             )
         }
