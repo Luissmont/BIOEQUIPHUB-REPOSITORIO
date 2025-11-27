@@ -56,7 +56,9 @@ fun HomeScreen(
                 HomeContent(
                     registryName = state.data.activeRegistry.name,
                     accessCode = state.data.activeRegistry.accessCode,
-                    userName = state.data.user.name
+                    userName = state.data.user.name,
+                    onNavigateToInventory = onNavigateToInventory,
+                    onNavigateToAddEquipment = onNavigateToAddEquipment
                 )
             } else {
                 NoRegistrySelected()

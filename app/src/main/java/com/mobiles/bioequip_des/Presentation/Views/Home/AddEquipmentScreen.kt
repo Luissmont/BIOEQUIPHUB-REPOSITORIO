@@ -37,6 +37,26 @@ import com.mobiles.bioequip_des.Presentation.ViewModel.UserUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.UserViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 import java.io.File
+import android.content.ContentResolver
+import java.io.FileOutputStream
+
+private fun copyUriToFile(context: Context, uri: Uri): Uri? {
+    return try {
+        val contentResolver: ContentResolver = context.contentResolver
+        val file = File(context.cacheDir, "upload_${System.currentTimeMillis()}.jpg")
+
+        contentResolver.openInputStream(uri)?.use { input ->
+            FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        Uri.fromFile(file)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -330,7 +350,8 @@ fun AddEquipmentScreen(
                                 createdBy = userId
                             )
 
-                            inventoryViewModel.addEquipment(equipment, photoUri)
+
+                            inventoryViewModel.addEquipment(equipment, photoUri, context)
                         }
                     }
                 },

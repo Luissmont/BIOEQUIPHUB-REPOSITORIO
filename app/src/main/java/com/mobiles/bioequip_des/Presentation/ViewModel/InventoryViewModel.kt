@@ -1,5 +1,6 @@
 package com.mobiles.bioequip_des.Presentation.ViewModel
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,11 +26,11 @@ class InventoryViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<InventoryUiState>(InventoryUiState.Idle)
     val uiState: StateFlow<InventoryUiState> = _uiState.asStateFlow()
 
-    fun addEquipment(equipment: Equipment, photoUri: Uri?) {
+    fun addEquipment(equipment: Equipment, photoUri: Uri?, context: Context) {
         viewModelScope.launch {
             _uiState.value = InventoryUiState.Loading
 
-            val result = repository.addEquipment(equipment, photoUri)
+            val result = repository.addEquipment(equipment, photoUri, context)
 
             _uiState.value = if (result.isSuccess) {
                 InventoryUiState.EquipmentAdded(result.getOrNull()!!)
