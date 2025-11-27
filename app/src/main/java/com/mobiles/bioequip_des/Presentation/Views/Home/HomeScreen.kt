@@ -28,6 +28,8 @@ import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 
 @Composable
 fun HomeScreen(
+    onNavigateToInventory: () -> Unit = {},
+    onNavigateToAddEquipment: () -> Unit = {},
     userViewModel: UserViewModel = viewModel()
 ) {
     val uiState by userViewModel.uiState.collectAsState()
@@ -81,7 +83,9 @@ fun HomeScreen(
 private fun HomeContent(
     registryName: String,
     accessCode: String,
-    userName: String
+    userName: String,
+    onNavigateToInventory: () -> Unit = {},
+    onNavigateToAddEquipment: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -155,7 +159,7 @@ private fun HomeContent(
                 icon = R.drawable.sunny,
                 title = "Inventario de Equipos",
                 description = "Aquí podrás observar todos los equipos del registro, podrás ver su información y realizar nuevos reportes",
-                onClick = {  }
+                onClick = onNavigateToInventory
             )
 
             OptionCard(
@@ -169,7 +173,7 @@ private fun HomeContent(
                 icon = R.drawable.sunny,
                 title = "Agregar Equipo",
                 description = "Agrega un equipo nuevo al inventario junto con todas sus especificaciones",
-                onClick = { }
+                onClick = onNavigateToAddEquipment
             )
         }
     }
@@ -196,7 +200,6 @@ private fun OptionCard(
                 .padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Ícono
             Box(
                 modifier = Modifier
                     .size(60.dp)
@@ -210,7 +213,6 @@ private fun OptionCard(
                 )
             }
 
-            // Texto
             Column(
                 modifier = Modifier.weight(1f)
             ) {
