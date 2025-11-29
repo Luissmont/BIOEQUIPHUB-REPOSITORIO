@@ -27,6 +27,8 @@ import com.mobiles.bioequip_des.Data.Models.Equipment
 import com.mobiles.bioequip_des.Presentation.ViewModel.InventoryUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.InventoryViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 
 @Composable
 fun EquipmentDetailScreen(
@@ -95,6 +97,7 @@ fun EquipmentDetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp)

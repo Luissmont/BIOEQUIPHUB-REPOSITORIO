@@ -1,5 +1,8 @@
 package com.mobiles.bioequip_des.Data.Models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+@Parcelize
 data class Equipment(
     val id: String = "",
     val registryId: String = "",
@@ -20,4 +23,4 @@ data class Equipment(
     val status: String = "disponible",
     val createdAt: Long = System.currentTimeMillis(),
     val createdBy: String = ""
-)
+) : Parcelable

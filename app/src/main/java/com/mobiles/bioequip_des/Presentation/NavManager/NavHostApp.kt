@@ -2,8 +2,11 @@ package com.mobiles.bioequip_des.Presentation.NavManager
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.mobiles.bioequip_des.Data.Models.Equipment
 import com.mobiles.bioequip_des.Presentation.Views.Auth.LoginScreen
 import com.mobiles.bioequip_des.Presentation.Views.Auth.RegisterScreen
 import com.mobiles.bioequip_des.Presentation.Views.Auth.SplashScreen
@@ -15,7 +18,8 @@ import com.mobiles.bioequip_des.Presentation.Views.Main.MainAppScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.AddEquipmentScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.EquipmentAddedSuccessScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.InventoryScreen
-
+import com.mobiles.bioequip_des.Presentation.Views.Home.EquipmentDetailScreen
+import com.mobiles.bioequip_des.Presentation.Views.Home.GeneralInfoTab
 
 @Composable
 fun NavHostApp(
@@ -38,7 +42,7 @@ fun NavHostApp(
                     }
                 },
                 onNavigateToMain = {
-                    navController.navigate(NavRoute.MainContainer.route){
+                    navController.navigate(NavRoute.MainContainer.route) {
                         popUpTo(NavRoute.Splash.route) { inclusive = true }
                     }
                 }
@@ -62,8 +66,21 @@ fun NavHostApp(
                     navController.popBackStack()
                 },
                 onRegisterSuccess = {
-                    navController.navigate(NavRoute.RegistrationSuccess.route){
-                        popUpTo(NavRoute.Register.route){inclusive = true}
+                    navController.navigate(NavRoute.RegistrationSuccess.route) {
+                        popUpTo(NavRoute.Register.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(route = NavRoute.Login.route) {
+            LoginScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onLoginSuccess = {
+                    navController.navigate(NavRoute.MainContainer.route) {
+                        popUpTo(NavRoute.Welcome.route) { inclusive = true }
                     }
                 }
             )
@@ -88,19 +105,6 @@ fun NavHostApp(
                 onCreateSuccess = {
                     navController.navigate(NavRoute.MainContainer.route) {
                         popUpTo(NavRoute.RegistrationSuccess.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(route = NavRoute.Login.route) {
-            LoginScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onLoginSuccess = {
-                    navController.navigate(NavRoute.MainContainer.route) {
-                        popUpTo(NavRoute.Welcome.route){ inclusive = true }
                     }
                 }
             )
@@ -141,11 +145,15 @@ fun NavHostApp(
             )
         }
 
-
         composable(route = NavRoute.Inventory.route) {
             InventoryScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToDetail = { equipmentId, registryId ->
+                    navController.navigate(
+                        NavRoute.EquipmentDetail.createRoute(equipmentId, registryId)
+                    )
                 }
             )
         }
@@ -173,5 +181,42 @@ fun NavHostApp(
             )
         }
 
+        composable(
+            route = NavRoute.EquipmentDetail.route,
+            arguments = listOf(
+                navArgument("equipmentId") { type = NavType.StringType },
+                navArgument("registryId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val equipmentId = backStackEntry.arguments?.getString("equipmentId") ?: ""
+            val registryId = backStackEntry.arguments?.getString("registryId") ?: ""
+
+            EquipmentDetailScreen(
+                equipmentId = equipmentId,
+                registryId = registryId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToGeneralInfo = { equipment ->
+                    navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipment)
+                    navController.navigate(NavRoute.GeneralInfo.route)
+                }
+            )
+        }
+
+        composable(route = NavRoute.GeneralInfo.route) {
+            val equipment = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Equipment>("equipment")
+
+            if (equipment != null) {
+                GeneralInfoTab(
+                    equipment = equipment,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
     }
 }

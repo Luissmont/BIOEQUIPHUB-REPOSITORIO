@@ -20,9 +20,10 @@ sealed class NavRoute(val route: String) {
     object Registry : NavRoute("registry")
     object Profile : NavRoute("profile")
 
-    object EquipmentDetail : NavRoute("equipment_detail/{equipmentId}") {
-        fun createRoute(equipmentId: String) = "equipment_detail/$equipmentId"
+    object EquipmentDetail : NavRoute("equipment_detail/{equipmentId}/{registryId}") {
+        fun createRoute(equipmentId: String, registryId: String) = "equipment_detail/$equipmentId/$registryId"
     }
+    object GeneralInfo: NavRoute("general_info")
     object ReportFault : NavRoute("report_fault")
     object Settings : NavRoute("settings")
 }

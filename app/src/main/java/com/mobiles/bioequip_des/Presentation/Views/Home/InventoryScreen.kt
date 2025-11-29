@@ -40,6 +40,7 @@ enum class EquipmentFilter {
 @Composable
 fun InventoryScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigateToDetail: (String, String) -> Unit = { _, _ -> },
     inventoryViewModel: InventoryViewModel = viewModel(),
     userViewModel: UserViewModel = viewModel()
 ) {
@@ -244,7 +245,12 @@ fun InventoryScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(filteredEquipments) { equipment ->
-                                EquipmentCard(equipment = equipment)
+                                EquipmentCard(
+                                    equipment = equipment,
+                                    onClick = {
+                                        onNavigateToDetail(equipment.id, equipment.registryId)
+                                    }
+                                )
                             }
                         }
                     }
@@ -309,11 +315,15 @@ private fun FilterCard(
 }
 
 @Composable
-private fun EquipmentCard(equipment: Equipment) {
+private fun EquipmentCard(
+    equipment: Equipment,
+    onClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(100.dp)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
     ) {
