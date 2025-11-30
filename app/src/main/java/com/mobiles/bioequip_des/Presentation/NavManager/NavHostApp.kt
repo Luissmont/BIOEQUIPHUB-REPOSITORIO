@@ -20,6 +20,8 @@ import com.mobiles.bioequip_des.Presentation.Views.Home.EquipmentAddedSuccessScr
 import com.mobiles.bioequip_des.Presentation.Views.Home.InventoryScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.EquipmentDetailScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.GeneralInfoTab
+import com.mobiles.bioequip_des.Presentation.Views.Home.CurrentTrackingTab
+import com.mobiles.bioequip_des.Presentation.Views.Home.ReportFaultScreen
 
 @Composable
 fun NavHostApp(
@@ -200,6 +202,10 @@ fun NavHostApp(
                 onNavigateToGeneralInfo = { equipment ->
                     navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipment)
                     navController.navigate(NavRoute.GeneralInfo.route)
+                },
+                onNavigateToTracking = { equipment ->
+                    navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipment)
+                    navController.navigate(NavRoute.CurrentTracking.route)
                 }
             )
         }
@@ -213,6 +219,43 @@ fun NavHostApp(
                 GeneralInfoTab(
                     equipment = equipment,
                     onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        composable(route = NavRoute.CurrentTracking.route) {
+            val equipment = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Equipment>("equipment")
+
+            if (equipment != null) {
+                CurrentTrackingTab(
+                    equipment = equipment,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToReportFault = { equipmentData ->
+                        navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipmentData)
+                        navController.navigate(NavRoute.ReportFault.route)
+                    }
+                )
+            }
+        }
+
+        composable(route = NavRoute.ReportFault.route) {
+            val equipment = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Equipment>("equipment")
+
+            if (equipment != null) {
+                ReportFaultScreen(
+                    equipment = equipment,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onReportCreated = {
                         navController.popBackStack()
                     }
                 )

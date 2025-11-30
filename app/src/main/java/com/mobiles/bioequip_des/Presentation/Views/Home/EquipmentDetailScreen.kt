@@ -4,7 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -16,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,8 +28,6 @@ import com.mobiles.bioequip_des.Data.Models.Equipment
 import com.mobiles.bioequip_des.Presentation.ViewModel.InventoryUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.InventoryViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 
 @Composable
 fun EquipmentDetailScreen(
@@ -36,6 +35,7 @@ fun EquipmentDetailScreen(
     registryId: String,
     onNavigateBack: () -> Unit = {},
     onNavigateToGeneralInfo: (Equipment) -> Unit = {},
+    onNavigateToTracking: (Equipment) -> Unit = {},
     inventoryViewModel: InventoryViewModel = viewModel()
 ) {
     val uiState by inventoryViewModel.uiState.collectAsState()
@@ -150,30 +150,15 @@ fun EquipmentDetailScreen(
                     icon = R.drawable.reload,
                     title = "Historial de Intervenciones",
                     description = "Apartado para que veas todas las intervenciones que ha tenido el equipo durante su estancia en la clínica",
-                    onClick = { /* TODO: Implementar después */ }
+                    onClick = {  }
                 )
 
                 OptionCard(
                     icon = R.drawable.seguimiento,
                     title = "Tracking Actual",
                     description = "Aquí podrás ver el estado actual de tu equipo y cómo se lleva su proceso en caso de tener un servicio",
-                    onClick = { /* TODO: Implementar después */ }
+                    onClick = { onNavigateToTracking(equipment) }
                 )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Button(
-                    onClick = {  },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFE53935)
-                    )
-                ) {
-                    Text("Reportar", fontSize = 18.sp, color = Color.White)
-                }
             }
         } else {
             Box(
