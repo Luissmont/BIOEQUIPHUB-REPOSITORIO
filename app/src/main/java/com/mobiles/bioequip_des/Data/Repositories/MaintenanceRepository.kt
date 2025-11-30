@@ -103,5 +103,46 @@ class MaintenanceRepository {
         }
     }
 
+    suspend fun getMaintenanceUpdates(reportId: String): Result<List<MaintenanceUpdate>> {
+        return try {
+            val querySnapshot = firestore.collection("maintenance_updates")
+                .whereEqualTo("reportId", reportId)
+                .get()
+                .await()
 
+            val updates = querySnapshot.documents.mapNotNull { doc ->
+                doc.toObject(MaintenanceUpdate::class.java)
+            }.sortedByDescending { it.createdAt }
+
+            Result.success(updates)
+        } catch (e: Exception) {
+            Log.e("MaintenanceRepository", "Error getting updates", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun finishMaintenance(
+        reportId: String,
+        equipmentId: String
+    ): Result<Unit> {
+        return try {
+            firestore.collection("reports").document(reportId)
+                .update(
+                    mapOf(
+                        "status" to "resolved",
+                        "resolvedAt" to System.currentTimeMillis()
+                    )
+                )
+                .await()
+
+            firestore.collection("equipment").document(equipmentId)
+                .update("status", "disponible")
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("MaintenanceRepository", "Error finishing maintenance", e)
+            Result.failure(e)
+        }
+    }
 }
