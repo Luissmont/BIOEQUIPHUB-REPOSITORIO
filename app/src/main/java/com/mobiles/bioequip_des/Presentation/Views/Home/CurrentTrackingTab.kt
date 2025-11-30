@@ -28,6 +28,8 @@ import com.mobiles.bioequip_des.Presentation.ViewModel.ReportViewModel
 import com.mobiles.bioequip_des.Presentation.ViewModel.UserUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.UserViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 
 @Composable
 fun CurrentTrackingTab(
@@ -217,10 +219,12 @@ private fun EquipmentFaultContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
 
         Box(
             modifier = Modifier
@@ -290,8 +294,14 @@ private fun EquipmentFaultContent(
         if (reportStatus == "pending") {
             val canStartMaintenance = when (userState) {
                 is UserUiState.Success -> {
-                    val userRole = userState.data.user.role
-                    userRole == "biomedico" || userRole == "tecnico"
+                    val userRole = userState.data.user.role.lowercase().trim()
+
+                    userRole in listOf(
+                        "biomedico",
+                        "biomédico",
+                        "tecnico",
+                        "técnico"
+                    )
                 }
                 else -> false
             }
@@ -319,6 +329,15 @@ private fun EquipmentFaultContent(
                     color = Color.Gray,
                     textAlign = TextAlign.Center
                 )
+
+                if (userState is UserUiState.Success){
+                    Text(
+                        text = "Tu rol: ${userState.data.user.role}",
+                        fontSize = 10.sp,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         } else if (reportStatus == "in_maintenance") {
             Text(
@@ -342,5 +361,7 @@ fun CurrentTrackingTabPreview() {
                 name = "Electrocardiógrafo"
             )
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
