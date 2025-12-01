@@ -27,5 +27,8 @@ sealed class NavRoute(val route: String) {
     object ReportFault : NavRoute("report_fault")
     object CurrentTracking : NavRoute("current_tracking")
     object Settings : NavRoute("settings")
+    object MaintenanceHistory : NavRoute("maintenance_history")
+    object AddMaintenanceUpdate : NavRoute("add_maintenance_update")
+    object MaintenanceUpdateDetail : NavRoute("maintenance_update_detail")
 
 }

@@ -36,6 +36,7 @@ fun CurrentTrackingTab(
     equipment: Equipment,
     onNavigateBack: () -> Unit = {},
     onNavigateToReportFault: (Equipment) -> Unit = {},
+    onNavigateToMaintenance: (Equipment, String) -> Unit = { _, _ -> },
     reportViewModel: ReportViewModel = viewModel(),
     userViewModel: UserViewModel = viewModel()
 ) {
@@ -113,27 +114,33 @@ fun CurrentTrackingTab(
                         onReportFault = { onNavigateToReportFault(equipment) }
                     )
                 } else {
-                    EquipmentFaultContent(
-                        reporterName = activeReport.reporterName,
-                        reason = activeReport.reason,
-                        reportStatus = activeReport.status,
-                        onStartMaintenance = {
-                            currentUser?.uid?.let { userId ->
-                                reportViewModel.startMaintenance(
-                                    activeReport.id,
-                                    userId,
-                                    equipment.id
-                                )
-                            }
-                        },
-                        userState = userState
-                    )
+                    if (activeReport.status == "in_maintenance") {
+                        LaunchedEffect(Unit) {
+                            onNavigateToMaintenance(equipment, activeReport.id)
+                        }
+                    } else {
+                        EquipmentFaultContent(
+                            reporterName = activeReport.reporterName,
+                            reason = activeReport.reason,
+                            reportStatus = activeReport.status,
+                            onStartMaintenance = {
+                                currentUser?.uid?.let { userId ->
+                                    reportViewModel.startMaintenance(
+                                        activeReport.id,
+                                        userId,
+                                        equipment.id
+                                    )
+                                }
+                            },
+                            userState = userState
+                        )
+                    }
                 }
             }
-
             is ReportUiState.MaintenanceStarted -> {
                 LaunchedEffect(Unit) {
-                    reportViewModel.getActiveReport(equipment.id)
+                    val reportId = (reportState as ReportUiState.MaintenanceStarted) .reportId
+                    onNavigateToMaintenance(equipment, reportId)
                 }
             }
 
