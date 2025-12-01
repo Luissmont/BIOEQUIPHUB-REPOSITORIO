@@ -1,5 +1,9 @@
 package com.mobiles.bioequip_des.Data.Models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class MaintenanceUpdate(
     val id: String = "",
     val reportId: String = "",
@@ -14,4 +18,4 @@ data class MaintenanceUpdate(
     val creatorName: String = "",
     val creatorRole: String = "",
     val createdAt: Long = System.currentTimeMillis()
-)
+) : Parcelable
