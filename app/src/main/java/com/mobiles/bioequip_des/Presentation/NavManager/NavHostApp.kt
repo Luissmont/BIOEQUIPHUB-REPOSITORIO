@@ -22,6 +22,10 @@ import com.mobiles.bioequip_des.Presentation.Views.Home.EquipmentDetailScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.GeneralInfoTab
 import com.mobiles.bioequip_des.Presentation.Views.Home.CurrentTrackingTab
 import com.mobiles.bioequip_des.Presentation.Views.Home.ReportFaultScreen
+import com.mobiles.bioequip_des.Presentation.Views.Home.MaintenanceHistoryScreen
+import com.mobiles.bioequip_des.Presentation.Views.Home.AddMaintenanceUpdateScreen
+import com.mobiles.bioequip_des.Presentation.Views.Home.MaintenanceUpdateDetailScreen
+import com.mobiles.bioequip_des.Data.Models.MaintenanceUpdate
 
 @Composable
 fun NavHostApp(
@@ -239,6 +243,11 @@ fun NavHostApp(
                     onNavigateToReportFault = { equipmentData ->
                         navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipmentData)
                         navController.navigate(NavRoute.ReportFault.route)
+                    },
+                    onNavigateToMaintenance = { equipmentData, reportId ->
+                        navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipmentData)
+                        navController.currentBackStackEntry?.savedStateHandle?.set("reportId", reportId)
+                        navController.navigate(NavRoute.MaintenanceHistory.route)
                     }
                 )
             }
@@ -256,6 +265,77 @@ fun NavHostApp(
                         navController.popBackStack()
                     },
                     onReportCreated = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        composable(route = NavRoute.MaintenanceHistory.route) {
+            val equipment = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Equipment>("equipment")
+
+            val reportId = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<String>("reportId")
+
+            if (equipment != null && reportId != null) {
+                MaintenanceHistoryScreen(
+                    equipment = equipment,
+                    reportId = reportId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToAddUpdate = { equipmentData, reportIdData ->
+                        navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipmentData)
+                        navController.currentBackStackEntry?.savedStateHandle?.set("reportId", reportIdData)
+                        navController.navigate(NavRoute.AddMaintenanceUpdate.route)
+                    },
+                    onNavigateToUpdateDetail = { update ->
+                        navController.currentBackStackEntry?.savedStateHandle?.set("update", update)
+                        navController.navigate(NavRoute.MaintenanceUpdateDetail.route)
+                    },
+                    onMaintenanceFinished = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        composable(route = NavRoute.AddMaintenanceUpdate.route) {
+            val equipment = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Equipment>("equipment")
+
+            val reportId = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<String>("reportId")
+
+            if (equipment != null && reportId != null) {
+                AddMaintenanceUpdateScreen(
+                    equipment = equipment,
+                    reportId = reportId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onUpdateCreated = {
+
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        composable(route = NavRoute.MaintenanceUpdateDetail.route) {
+            val update = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<MaintenanceUpdate>("update")
+
+            if (update != null) {
+                MaintenanceUpdateDetailScreen(
+                    update = update,
+                    onNavigateBack = {
                         navController.popBackStack()
                     }
                 )
