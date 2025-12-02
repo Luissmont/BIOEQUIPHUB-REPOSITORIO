@@ -91,4 +91,23 @@ class ReportRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun getEquipmentInterventionsHistory(equipmentId: String): Result<List<Report>> {
+        return try {
+            val querySnapshot = firestore.collection("reports")
+                .whereEqualTo("equipmentId", equipmentId)
+                .whereIn("status", listOf("resolved", "in_maintenance"))
+                .get()
+                .await()
+
+            val reports = querySnapshot.documents.mapNotNull { doc ->
+                doc.toObject(Report::class.java)
+            }.sortedByDescending { it.createdAt }
+
+            Result.success(reports)
+        } catch (e: Exception) {
+            Log.e("ReportRepository", "Error getting interventions history", e)
+            Result.failure(e)
+        }
+    }
 }
