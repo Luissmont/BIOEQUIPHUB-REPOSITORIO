@@ -78,4 +78,20 @@ class ReportViewModel : ViewModel() {
     fun resetState() {
         _uiState.value = ReportUiState.Idle
     }
+
+    fun getInterventionsHistory(equipmentId: String) {
+        viewModelScope.launch {
+            _uiState.value = ReportUiState.Loading
+
+            val result = repository.getEquipmentInterventionsHistory(equipmentId)
+
+            _uiState.value = if (result.isSuccess) {
+                ReportUiState.InterventionsHistory(result.getOrNull()!!)
+            } else {
+                ReportUiState.Error(
+                    result.exceptionOrNull()?.message ?: "Error al cargar historial"
+                )
+            }
+        }
+    }
 }
