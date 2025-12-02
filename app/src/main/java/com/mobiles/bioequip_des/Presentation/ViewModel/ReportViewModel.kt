@@ -15,6 +15,7 @@ sealed class ReportUiState {
     data class Success(val report: Report?) : ReportUiState()
     data class ReportCreated(val report: Report) : ReportUiState()
     data class MaintenanceStarted(val reportId: String) : ReportUiState()
+    data class InterventionsHistory(val reports: List<Report>) : ReportUiState()
     data class Error(val message: String) : ReportUiState()
 }
 
