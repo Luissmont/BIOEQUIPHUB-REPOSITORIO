@@ -29,6 +29,7 @@ import com.mobiles.bioequip_des.Presentation.ViewModel.InventoryUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.InventoryViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 
+
 @Composable
 fun EquipmentDetailScreen(
     equipmentId: String,
@@ -36,6 +37,7 @@ fun EquipmentDetailScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToGeneralInfo: (Equipment) -> Unit = {},
     onNavigateToTracking: (Equipment) -> Unit = {},
+    onNavigateToInterventions: (Equipment) -> Unit = {},
     inventoryViewModel: InventoryViewModel = viewModel()
 ) {
     val uiState by inventoryViewModel.uiState.collectAsState()
@@ -150,7 +152,7 @@ fun EquipmentDetailScreen(
                     icon = R.drawable.reload,
                     title = "Historial de Intervenciones",
                     description = "Apartado para que veas todas las intervenciones que ha tenido el equipo durante su estancia en la clínica",
-                    onClick = {  }
+                    onClick = { onNavigateToInterventions(equipment) }
                 )
 
                 OptionCard(

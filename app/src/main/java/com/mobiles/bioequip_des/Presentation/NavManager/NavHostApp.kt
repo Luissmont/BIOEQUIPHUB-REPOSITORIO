@@ -26,6 +26,8 @@ import com.mobiles.bioequip_des.Presentation.Views.Home.MaintenanceHistoryScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.AddMaintenanceUpdateScreen
 import com.mobiles.bioequip_des.Presentation.Views.Home.MaintenanceUpdateDetailScreen
 import com.mobiles.bioequip_des.Data.Models.MaintenanceUpdate
+import com.mobiles.bioequip_des.Presentation.Views.Home.InterventionsHistoryTab
+
 
 @Composable
 fun NavHostApp(
@@ -210,6 +212,10 @@ fun NavHostApp(
                 onNavigateToTracking = { equipment ->
                     navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipment)
                     navController.navigate(NavRoute.CurrentTracking.route)
+                },
+                onNavigateToInterventions = { equipment ->
+                    navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipment)
+                    navController.navigate(NavRoute.InterventionsHistory.route)
                 }
             )
         }
@@ -224,6 +230,26 @@ fun NavHostApp(
                     equipment = equipment,
                     onNavigateBack = {
                         navController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        composable(route = NavRoute.InterventionsHistory.route) {
+            val equipment = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Equipment>("equipment")
+
+            if (equipment != null) {
+                InterventionsHistoryTab(
+                    equipment = equipment,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToInterventionDetail = { equipmentData, reportId ->
+                        navController.currentBackStackEntry?.savedStateHandle?.set("equipment", equipmentData)
+                        navController.currentBackStackEntry?.savedStateHandle?.set("reportId", reportId)
+                        navController.navigate(NavRoute.MaintenanceHistory.route)
                     }
                 )
             }
