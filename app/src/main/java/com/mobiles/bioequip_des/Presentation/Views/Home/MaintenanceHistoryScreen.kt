@@ -28,6 +28,7 @@ import com.mobiles.bioequip_des.Data.Models.Equipment
 import com.mobiles.bioequip_des.Data.Models.MaintenanceUpdate
 import com.mobiles.bioequip_des.Presentation.ViewModel.MaintenanceUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.MaintenanceViewModel
+import com.mobiles.bioequip_des.Presentation.ViewModel.ReportViewModel
 import com.mobiles.bioequip_des.Presentation.ViewModel.UserUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.UserViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
@@ -43,13 +44,15 @@ fun MaintenanceHistoryScreen(
     onNavigateToUpdateDetail: (MaintenanceUpdate) -> Unit = {},
     onMaintenanceFinished: () -> Unit = {},
     maintenanceViewModel: MaintenanceViewModel = viewModel(),
-    userViewModel: UserViewModel = viewModel()
+    userViewModel: UserViewModel = viewModel(),
+    reportViewModel: ReportViewModel = viewModel()
 ) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     val maintenanceState by maintenanceViewModel.uiState.collectAsState()
     val userState by userViewModel.uiState.collectAsState()
 
     var showFinishDialog by remember { mutableStateOf(false) }
+    var reportIsResolved by remember { mutableStateOf(false) }
 
     LaunchedEffect(currentUser?.uid) {
         currentUser?.uid?.let { uid ->
@@ -59,6 +62,17 @@ fun MaintenanceHistoryScreen(
 
     LaunchedEffect(reportId) {
         maintenanceViewModel.loadUpdates(reportId)
+    }
+
+    LaunchedEffect(reportId) {
+        reportViewModel.getActiveReport(equipment.id)
+    }
+
+    LaunchedEffect(reportViewModel.uiState.collectAsState().value) {
+        val reportState = reportViewModel.uiState.value
+        if (reportState is com.mobiles.bioequip_des.Presentation.ViewModel.ReportUiState.Success) {
+            reportIsResolved = reportState.report?.status == "resolved"
+        }
     }
 
     LaunchedEffect(maintenanceState) {
@@ -129,20 +143,25 @@ fun MaintenanceHistoryScreen(
             Box(
                 modifier = Modifier
                     .size(120.dp)
-                    .background(Color(0xFFFFA726), CircleShape)
+                    .background(
+                        if (reportIsResolved) Color(0xFF4CAF50) else Color(0xFFFFA726),
+                        CircleShape
+                    )
                     .align(Alignment.CenterHorizontally),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.reload),
-                    contentDescription = "En mantenimiento",
+                    painter = painterResource(
+                        id = if (reportIsResolved) R.drawable.check2 else R.drawable.reload
+                    ),
+                    contentDescription = if (reportIsResolved) "Finalizado" else "En mantenimiento",
                     modifier = Modifier.size(60.dp),
                     tint = Color.White
                 )
             }
 
             Text(
-                text = "EN MANTENIMIENTO",
+                text = if (reportIsResolved) "MANTENIMIENTO FINALIZADO" else "EN MANTENIMIENTO",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -201,38 +220,40 @@ fun MaintenanceHistoryScreen(
                 else -> {}
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    onClick = { onNavigateToAddUpdate(equipment, reportId) },
-                    enabled = canModify,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00BCD4),
-                        disabledContainerColor = Color.LightGray
-                    )
+            if (!reportIsResolved) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Actualizar", fontSize = 16.sp, color = Color.White)
-                }
+                    Button(
+                        onClick = { onNavigateToAddUpdate(equipment, reportId) },
+                        enabled = canModify,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF00BCD4),
+                            disabledContainerColor = Color.LightGray
+                        )
+                    ) {
+                        Text("Actualizar", fontSize = 16.sp, color = Color.White)
+                    }
 
-                Button(
-                    onClick = { showFinishDialog = true },
-                    enabled = canModify,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50),
-                        disabledContainerColor = Color.LightGray
-                    )
-                ) {
-                    Text("FINALIZAR", fontSize = 16.sp, color = Color.White)
+                    Button(
+                        onClick = { showFinishDialog = true },
+                        enabled = canModify,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            disabledContainerColor = Color.LightGray
+                        )
+                    ) {
+                        Text("FINALIZAR", fontSize = 16.sp, color = Color.White)
+                    }
                 }
             }
         }

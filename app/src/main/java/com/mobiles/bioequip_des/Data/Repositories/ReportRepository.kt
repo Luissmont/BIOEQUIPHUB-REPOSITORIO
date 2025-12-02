@@ -96,7 +96,7 @@ class ReportRepository {
         return try {
             val querySnapshot = firestore.collection("reports")
                 .whereEqualTo("equipmentId", equipmentId)
-                .whereIn("status", listOf("resolved", "in_maintenance"))
+                .whereEqualTo("status", "resolved")
                 .get()
                 .await()
 

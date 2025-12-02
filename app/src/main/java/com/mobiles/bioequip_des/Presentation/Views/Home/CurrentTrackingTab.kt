@@ -3,8 +3,10 @@ package com.mobiles.bioequip_des.Presentation.Views.Home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -28,8 +30,6 @@ import com.mobiles.bioequip_des.Presentation.ViewModel.ReportViewModel
 import com.mobiles.bioequip_des.Presentation.ViewModel.UserUiState
 import com.mobiles.bioequip_des.Presentation.ViewModel.UserViewModel
 import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 
 @Composable
 fun CurrentTrackingTab(
@@ -114,33 +114,32 @@ fun CurrentTrackingTab(
                         onReportFault = { onNavigateToReportFault(equipment) }
                     )
                 } else {
-                    if (activeReport.status == "in_maintenance") {
-                        LaunchedEffect(Unit) {
+                    EquipmentFaultContent(
+                        reporterName = activeReport.reporterName,
+                        reason = activeReport.reason,
+                        reportStatus = activeReport.status,
+                        reportId = activeReport.id,
+                        equipment = equipment,
+                        onStartMaintenance = {
+                            currentUser?.uid?.let { userId ->
+                                reportViewModel.startMaintenance(
+                                    activeReport.id,
+                                    userId,
+                                    equipment.id
+                                )
+                            }
+                        },
+                        onNavigateToMaintenance = {
                             onNavigateToMaintenance(equipment, activeReport.id)
-                        }
-                    } else {
-                        EquipmentFaultContent(
-                            reporterName = activeReport.reporterName,
-                            reason = activeReport.reason,
-                            reportStatus = activeReport.status,
-                            onStartMaintenance = {
-                                currentUser?.uid?.let { userId ->
-                                    reportViewModel.startMaintenance(
-                                        activeReport.id,
-                                        userId,
-                                        equipment.id
-                                    )
-                                }
-                            },
-                            userState = userState
-                        )
-                    }
+                        },
+                        userState = userState
+                    )
                 }
             }
+
             is ReportUiState.MaintenanceStarted -> {
                 LaunchedEffect(Unit) {
-                    val reportId = (reportState as ReportUiState.MaintenanceStarted) .reportId
-                    onNavigateToMaintenance(equipment, reportId)
+                    reportViewModel.getActiveReport(equipment.id)
                 }
             }
 
@@ -220,7 +219,10 @@ private fun EquipmentFaultContent(
     reporterName: String,
     reason: String,
     reportStatus: String,
+    reportId: String,
+    equipment: Equipment,
     onStartMaintenance: () -> Unit,
+    onNavigateToMaintenance: () -> Unit,
     userState: UserUiState
 ) {
     Column(
@@ -247,7 +249,7 @@ private fun EquipmentFaultContent(
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "El equipo se encuentra\nfuera de servicio",
@@ -258,7 +260,7 @@ private fun EquipmentFaultContent(
             lineHeight = 24.sp
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -296,19 +298,13 @@ private fun EquipmentFaultContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (reportStatus == "pending") {
             val canStartMaintenance = when (userState) {
                 is UserUiState.Success -> {
                     val userRole = userState.data.user.role.lowercase().trim()
-
-                    userRole in listOf(
-                        "biomedico",
-                        "biomédico",
-                        "tecnico",
-                        "técnico"
-                    )
+                    userRole in listOf("biomedico", "biomédico", "tecnico", "técnico")
                 }
                 else -> false
             }
@@ -317,15 +313,20 @@ private fun EquipmentFaultContent(
                 onClick = onStartMaintenance,
                 enabled = canStartMaintenance,
                 modifier = Modifier
-                    .width(240.dp)
-                    .height(48.dp),
+                    .fillMaxWidth()
+                    .height(56.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFFA726),
                     disabledContainerColor = Color.LightGray
                 )
             ) {
-                Text("Empezar Mantenimiento", fontSize = 16.sp, color = Color.White)
+                Text(
+                    "Empezar Mantenimiento",
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             if (!canStartMaintenance) {
@@ -336,25 +337,28 @@ private fun EquipmentFaultContent(
                     color = Color.Gray,
                     textAlign = TextAlign.Center
                 )
-
-                if (userState is UserUiState.Success){
-                    Text(
-                        text = "Tu rol: ${userState.data.user.role}",
-                        fontSize = 10.sp,
-                        color = Color.Red,
-                        textAlign = TextAlign.Center
-                    )
-                }
             }
         } else if (reportStatus == "in_maintenance") {
-            Text(
-                text = "Este equipo está en mantenimiento",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFFFA726),
-                textAlign = TextAlign.Center
-            )
+            Button(
+                onClick = onNavigateToMaintenance,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFFA726)
+                )
+            ) {
+                Text(
+                    "Ver Mantenimiento en Curso",
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -368,7 +372,5 @@ fun CurrentTrackingTabPreview() {
                 name = "Electrocardiógrafo"
             )
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
