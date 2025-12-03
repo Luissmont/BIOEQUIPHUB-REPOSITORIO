@@ -27,6 +27,7 @@ import com.mobiles.bioequip_des.Presentation.Views.Home.AddMaintenanceUpdateScre
 import com.mobiles.bioequip_des.Presentation.Views.Home.MaintenanceUpdateDetailScreen
 import com.mobiles.bioequip_des.Data.Models.MaintenanceUpdate
 import com.mobiles.bioequip_des.Presentation.Views.Home.InterventionsHistoryTab
+import com.mobiles.bioequip_des.Presentation.Views.Home.MyReportsScreen
 
 
 @Composable
@@ -149,6 +150,9 @@ fun NavHostApp(
                 },
                 onNavigateToAddEquipment = {
                     navController.navigate(NavRoute.AddEquipment.route)
+                },
+                onNavigateToMyReports = {
+                    navController.navigate(NavRoute.MyReports.route)  // ← CORREGIDO
                 }
             )
         }
@@ -185,6 +189,19 @@ fun NavHostApp(
                     navController.navigate(NavRoute.MainContainer.route) {
                         popUpTo(NavRoute.MainContainer.route) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        composable(route = NavRoute.MyReports.route) {
+            MyReportsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToEquipmentDetail = { equipmentId, registryId ->
+                    navController.navigate(
+                        NavRoute.EquipmentDetail.createRoute(equipmentId, registryId)
+                    )
                 }
             )
         }
@@ -346,7 +363,6 @@ fun NavHostApp(
                         navController.popBackStack()
                     },
                     onUpdateCreated = {
-
                         navController.popBackStack()
                     }
                 )

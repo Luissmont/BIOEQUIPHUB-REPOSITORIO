@@ -17,6 +17,7 @@ sealed class NavRoute(val route: String) {
     object Inventory : NavRoute("inventory")
     object AddEquipment : NavRoute("add_equipment")
     object EquipmentAddedSuccess : NavRoute("equipment_added_success")
+    object MyReports : NavRoute("my_reports")
     object Registry : NavRoute("registry")
     object Profile : NavRoute("profile")
 

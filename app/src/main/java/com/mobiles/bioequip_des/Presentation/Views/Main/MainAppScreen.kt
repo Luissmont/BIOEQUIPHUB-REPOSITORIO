@@ -25,7 +25,8 @@ fun MainAppScreen(
     onNavigateToCreateRegistry: () -> Unit = {},
     onNavigateToJoinRegistry: () -> Unit = {},
     onNavigateToInventory: () -> Unit = {},
-    onNavigateToAddEquipment: () -> Unit = {}
+    onNavigateToAddEquipment: () -> Unit = {},
+    onNavigateToMyReports: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -76,7 +77,8 @@ fun MainAppScreen(
             composable(NavRoute.Home.route) {
                 HomeScreen(
                     onNavigateToInventory = onNavigateToInventory,
-                    onNavigateToAddEquipment = onNavigateToAddEquipment
+                    onNavigateToAddEquipment = onNavigateToAddEquipment,
+                    onNavigateToMyReports = onNavigateToMyReports
                 )
             }
             composable(NavRoute.Profile.route) {

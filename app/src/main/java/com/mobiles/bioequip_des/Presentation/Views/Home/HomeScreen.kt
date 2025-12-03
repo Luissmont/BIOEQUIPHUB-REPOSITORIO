@@ -30,6 +30,7 @@ import com.mobiles.bioequip_des.Presentation.ui.theme.BIOEQUIPDESTheme
 fun HomeScreen(
     onNavigateToInventory: () -> Unit = {},
     onNavigateToAddEquipment: () -> Unit = {},
+    onNavigateToMyReports: () -> Unit = {},  // ← AGREGADO
     userViewModel: UserViewModel = viewModel()
 ) {
     val uiState by userViewModel.uiState.collectAsState()
@@ -58,7 +59,8 @@ fun HomeScreen(
                     accessCode = state.data.activeRegistry.accessCode,
                     userName = state.data.user.name,
                     onNavigateToInventory = onNavigateToInventory,
-                    onNavigateToAddEquipment = onNavigateToAddEquipment
+                    onNavigateToAddEquipment = onNavigateToAddEquipment,
+                    onNavigateToMyReports = onNavigateToMyReports  // ← AGREGADO
                 )
             } else {
                 NoRegistrySelected()
@@ -87,7 +89,8 @@ private fun HomeContent(
     accessCode: String,
     userName: String,
     onNavigateToInventory: () -> Unit = {},
-    onNavigateToAddEquipment: () -> Unit = {}
+    onNavigateToAddEquipment: () -> Unit = {},
+    onNavigateToMyReports: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -168,7 +171,7 @@ private fun HomeContent(
                 icon = R.drawable.sunny,
                 title = "Mis Reportes",
                 description = "Revisa tus reportes, su tracking y su estado actual",
-                onClick = { }
+                onClick = onNavigateToMyReports
             )
 
             OptionCard(
