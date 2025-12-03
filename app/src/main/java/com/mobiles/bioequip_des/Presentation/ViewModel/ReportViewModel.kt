@@ -16,6 +16,7 @@ sealed class ReportUiState {
     data class ReportCreated(val report: Report) : ReportUiState()
     data class MaintenanceStarted(val reportId: String) : ReportUiState()
     data class InterventionsHistory(val reports: List<Report>) : ReportUiState()
+    data class UserReports(val reports: List<Report>) : ReportUiState()
     data class Error(val message: String) : ReportUiState()
 }
 
@@ -90,6 +91,22 @@ class ReportViewModel : ViewModel() {
             } else {
                 ReportUiState.Error(
                     result.exceptionOrNull()?.message ?: "Error al cargar historial"
+                )
+            }
+        }
+    }
+
+    fun getUserReports(userId: String) {
+        viewModelScope.launch {
+            _uiState.value = ReportUiState.Loading
+
+            val result = repository.getUserReports(userId)
+
+            _uiState.value = if (result.isSuccess) {
+                ReportUiState.UserReports(result.getOrNull()!!)
+            } else {
+                ReportUiState.Error(
+                    result.exceptionOrNull()?.message ?: "Error al cargar reportes"
                 )
             }
         }
